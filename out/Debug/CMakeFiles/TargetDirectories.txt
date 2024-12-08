@@ -1,0 +1,16 @@
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/CMakeFiles/edit_cache.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/CMakeFiles/rebuild_cache.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/CMakeFiles/edit_cache.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/CMakeFiles/rebuild_cache.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/board/CMakeFiles/board.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/board/CMakeFiles/edit_cache.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/board/CMakeFiles/rebuild_cache.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/game/CMakeFiles/game.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/game/CMakeFiles/edit_cache.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/game/CMakeFiles/rebuild_cache.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/input/CMakeFiles/input.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/input/CMakeFiles/edit_cache.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/input/CMakeFiles/rebuild_cache.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/bin/CMakeFiles/TicTacToe.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/bin/CMakeFiles/edit_cache.dir
+/home/alex/Documents/Projects/tic-tac-toe/out/Debug/bin/CMakeFiles/rebuild_cache.dir

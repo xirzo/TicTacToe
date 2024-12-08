@@ -1,0 +1,32 @@
+[
+{
+  "directory": "/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/board",
+  "command": "/sbin/c++    -O3 -ftrapv -fsanitize=address,undefined -g -std=gnu++23 -o CMakeFiles/board.dir/board.cpp.o -c /home/alex/Documents/Projects/tic-tac-toe/lib/board/board.cpp",
+  "file": "/home/alex/Documents/Projects/tic-tac-toe/lib/board/board.cpp",
+  "output": "lib/board/CMakeFiles/board.dir/board.cpp.o"
+},
+{
+  "directory": "/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/board",
+  "command": "/sbin/c++    -O3 -ftrapv -fsanitize=address,undefined -g -std=gnu++23 -o CMakeFiles/board.dir/cell.cpp.o -c /home/alex/Documents/Projects/tic-tac-toe/lib/board/cell.cpp",
+  "file": "/home/alex/Documents/Projects/tic-tac-toe/lib/board/cell.cpp",
+  "output": "lib/board/CMakeFiles/board.dir/cell.cpp.o"
+},
+{
+  "directory": "/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/game",
+  "command": "/sbin/c++  -I/home/alex/Documents/Projects/tic-tac-toe/lib/game/../board -I/home/alex/Documents/Projects/tic-tac-toe/lib/input/../game  -O3 -ftrapv -fsanitize=address,undefined -g -std=gnu++23 -o CMakeFiles/game.dir/game.cpp.o -c /home/alex/Documents/Projects/tic-tac-toe/lib/game/game.cpp",
+  "file": "/home/alex/Documents/Projects/tic-tac-toe/lib/game/game.cpp",
+  "output": "lib/game/CMakeFiles/game.dir/game.cpp.o"
+},
+{
+  "directory": "/home/alex/Documents/Projects/tic-tac-toe/out/Debug/lib/input",
+  "command": "/sbin/c++  -I/home/alex/Documents/Projects/tic-tac-toe/lib/game/../board -I/home/alex/Documents/Projects/tic-tac-toe/lib/input/../game  -O3 -ftrapv -fsanitize=address,undefined -g -std=gnu++23 -o CMakeFiles/input.dir/input.cpp.o -c /home/alex/Documents/Projects/tic-tac-toe/lib/input/input.cpp",
+  "file": "/home/alex/Documents/Projects/tic-tac-toe/lib/input/input.cpp",
+  "output": "lib/input/CMakeFiles/input.dir/input.cpp.o"
+},
+{
+  "directory": "/home/alex/Documents/Projects/tic-tac-toe/out/Debug/bin",
+  "command": "/sbin/c++  -I/home/alex/Documents/Projects/tic-tac-toe/bin/../lib -I/home/alex/Documents/Projects/tic-tac-toe/lib/game/../board -I/home/alex/Documents/Projects/tic-tac-toe/lib/input/../game  -O3 -ftrapv -fsanitize=address,undefined -g -std=gnu++23 -o CMakeFiles/TicTacToe.dir/main.cpp.o -c /home/alex/Documents/Projects/tic-tac-toe/bin/main.cpp",
+  "file": "/home/alex/Documents/Projects/tic-tac-toe/bin/main.cpp",
+  "output": "bin/CMakeFiles/TicTacToe.dir/main.cpp.o"
+}
+]

@@ -1,0 +1,167 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						5
+					],
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5.0"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "lib",
+					"childIndexes" : 
+					[
+						2,
+						3,
+						4
+					],
+					"jsonFile" : "directory-lib-Debug-c12f15c6f888b43a891c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "lib"
+				},
+				{
+					"build" : "lib/board",
+					"jsonFile" : "directory-lib.board-Debug-433015530fccbae71956.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5.0"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "lib/board",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "lib/game",
+					"jsonFile" : "directory-lib.game-Debug-e084fa75e4caea1bb4df.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5.0"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "lib/game",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "lib/input",
+					"jsonFile" : "directory-lib.input-Debug-28259f0a99b20a62ea56.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5.0"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "lib/input",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "bin",
+					"jsonFile" : "directory-bin-Debug-9ecb904d635c36109f32.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "bin",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					],
+					"name" : "TicTacToe",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 5,
+					"id" : "TicTacToe::@90a2315b7a9c97cd24d2",
+					"jsonFile" : "target-TicTacToe-Debug-1acfcc03337e9b2277d7.json",
+					"name" : "TicTacToe",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "board::@66cb39b9543924d27aa6",
+					"jsonFile" : "target-board-Debug-c09bfa5793913e5eb010.json",
+					"name" : "board",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "game::@a651714f2bf5b3424d20",
+					"jsonFile" : "target-game-Debug-2cc959eae78e3904edbf.json",
+					"name" : "game",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "input::@eef78ed33eb4418fddef",
+					"jsonFile" : "target-input-Debug-d0c7b500bbd61099527c.json",
+					"name" : "input",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/alex/Documents/Projects/tic-tac-toe/out/Debug",
+		"source" : "/home/alex/Documents/Projects/tic-tac-toe"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

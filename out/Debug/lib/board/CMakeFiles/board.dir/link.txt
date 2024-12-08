@@ -1,0 +1,2 @@
+/sbin/ar qc libboard.a CMakeFiles/board.dir/board.cpp.o CMakeFiles/board.dir/cell.cpp.o
+/sbin/ranlib libboard.a

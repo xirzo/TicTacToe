@@ -1,0 +1,1 @@
+/sbin/c++  -O3 -ftrapv -fsanitize=address,undefined -g CMakeFiles/TicTacToe.dir/main.cpp.o -o TicTacToe  ../lib/game/libgame.a ../lib/input/libinput.a ../lib/game/libgame.a ../lib/board/libboard.a
