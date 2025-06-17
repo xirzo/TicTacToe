@@ -10,7 +10,7 @@
 
 // TODO: remove global_state
 
-static game_state_t g_state;
+static server_game_state_t g_state;
 
 static int is_game_finished();
 static void *handle_client(void *arg);
@@ -18,7 +18,7 @@ static int check_win();
 static int check_draw();
 
 int main(void) {
-  state_init(&g_state);
+  server_state_init(&g_state);
 
   server_t *server = sr_create_server(SERVER_PORT, handle_client);
 
@@ -31,10 +31,19 @@ int main(void) {
 
   printf("Starting game loop\n");
 
-  // while (!is_game_finished()) {
-  // }
+  while (!is_game_finished()) {
+    // switch (g_state.turn_role) {
+    //   case PLAYER_CIRCLE: {
+    //     break;
+    //   }
+    //   case PLAYER_CROSS: {
+    //     break;
+    //   }
+    // }
+  }
 
   while (1) {
+    // waiting for restart
   }
 
   return 0;
@@ -74,8 +83,18 @@ void *handle_client(void *arg) {
 
     switch (msg.type) {
       case CLIENT_MSG_SET_MARK: {
+        if (g_state.turn_role != con->client_type) {
+          printf(
+              "Client %d tried to send mark on: (%.2f, %.2f)\n",
+              con->client_id,
+              msg.data.position.x,
+              msg.data.position.y
+          );
+          break;
+        }
+
         printf(
-            "Client %d set mark on: (%.2f, %.2f)\n",
+            "Client %d sent mark on: (%.2f, %.2f)\n",
             con->client_id,
             msg.data.position.x,
             msg.data.position.y
@@ -95,6 +114,14 @@ void *handle_client(void *arg) {
           }
         }
 
+        server_message_t allow_msg = {
+          .type = SERVER_MSG_ALLOW,
+          .client_id = con->client_id,
+          .timestamp = time(NULL),
+        };
+
+        sr_send_message_to_client(server, con->client_id, &allow_msg);
+
         server_message_t pos_broadcast = { .type = SERVER_MSG_MARK_SET,
                                            .client_id = con->client_id,
                                            .timestamp = time(NULL),
@@ -103,7 +130,7 @@ void *handle_client(void *arg) {
         sr_send_message_to_all_except(server, con->client_id, &pos_broadcast);
 
         if (check_win() || check_draw()) {
-          server_message_t game_end_message = { .type = SERVER_MSG_MARK_GAME_END,
+          server_message_t game_end_message = { .type = SERVER_MSG_GAME_END,
                                                 .client_id = con->client_id,
                                                 .timestamp = time(NULL),
                                                 .data.position = msg.data.position };
@@ -223,5 +250,3 @@ int check_draw() {
 int is_game_finished() {
   return g_state.is_finished == 1;
 }
-
-// TODO: draw detection

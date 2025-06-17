@@ -11,7 +11,8 @@
 
 typedef enum {
   SERVER_MSG_MARK_SET,
-  SERVER_MSG_MARK_GAME_END,
+  SERVER_MSG_GAME_END,
+  SERVER_MSG_ALLOW,
 } server_message_type;
 
 typedef struct server_message {

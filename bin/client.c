@@ -2,6 +2,7 @@
 #include "properties.h"
 #include "raylib.h"
 #include <fcntl.h>
+#include <iso646.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,26 +17,27 @@ void button_on_pressed(button_t *btn) {
   game_state_t *state = (game_state_t *)btn->param;
 
   float width = BOARD_SIDE * BOARD_BUTTON_SIZE + (BOARD_SIDE - 1) * BOARD_SPACING;
+  float start_x = (float)SCREEN_WIDTH / 2 - width / 2;
+  float start_y = (float)SCREEN_HEIGHT / 2 - width / 2;
 
-  float start_y = (float)SCREEN_WIDTH / 2 - width / 2;
-  float start_x = (float)SCREEN_HEIGHT / 2 - width / 2;
-
-  float relative_x = btn->pos.x - start_y;
-  float relative_y = btn->pos.y - start_x;
+  float relative_x = btn->pos.x - start_x;
+  float relative_y = btn->pos.y - start_y;
 
   int x = (int)(relative_x / (BOARD_BUTTON_SIZE + BOARD_SPACING));
   int y = (int)(relative_y / (BOARD_BUTTON_SIZE + BOARD_SPACING));
 
-  if (x >= 0 && x < BOARD_SIDE && y >= 0 && y < BOARD_SIDE && state->cells[x][y] == CELL_EMPTY) {
-    state->cells[x][y] = CELL_PLAYER;
-    btn->color = PLAYER_COLOR;
-
-    client_message_t msg = {
+  if (x >= 0 && x < BOARD_SIDE && y >= 0 && y < BOARD_SIDE && state->cells[x][y] == CELL_EMPTY
+      && !state->waiting_for_response) {
+    client_message_t set_mark_msg = {
       .type = CLIENT_MSG_SET_MARK,
       .data.position = (vec2){ x, y },
     };
 
-    sr_send_message_to_server(&state->client, &msg);
+    if (sr_send_message_to_server(&state->client, &set_mark_msg) == 0) {
+      state->pending_x = x;
+      state->pending_y = y;
+      state->waiting_for_response = 1;
+    }
   }
 }
 
@@ -43,20 +45,25 @@ void receive_server_message(game_state_t *state) {
   client_t *client = &state->client;
   server_message_t msg;
 
-  if ((sr_receive_server_message(client, &msg)) < 0) {
+  if (sr_receive_server_message(client, &msg) < 0) {
     return;
   }
 
   switch (msg.type) {
+    case SERVER_MSG_ALLOW: {
+      if (state->waiting_for_response) {
+        state->cells[state->pending_x][state->pending_y] = CELL_PLAYER;
+        state->waiting_for_response = 0;
+      }
+      break;
+    }
     case SERVER_MSG_MARK_SET: {
-      fprintf(stderr, "Enemy mark set\n");
       int x = (int)msg.data.position.x;
       int y = (int)msg.data.position.y;
       state->cells[x][y] = CELL_ENEMY;
       break;
     }
-    case SERVER_MSG_MARK_GAME_END: {
-      fprintf(stderr, "Game finished\n");
+    case SERVER_MSG_GAME_END: {
       state->is_finished = 1;
       break;
     }
