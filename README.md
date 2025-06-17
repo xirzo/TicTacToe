@@ -1,6 +1,6 @@
 # TicTacToe
 
-A C implementation of the classic Tic-Tac-Toe game.
+A C multiplayer implementation of the Tic-Tac-Toe game. Includes a server and a client.
 
 ## Build Instructions
 
@@ -13,7 +13,15 @@ mkdir build && cd build
 Generate build files:
 
 ```bash
-cmake ..
+cmake .. -DFETCH_LIBS=1
+```
+
+or
+
+```bash
+# (!IMPORTANT) you should have [raylib](https://github.com/raysan5/raylib) installed on your computer
+
+cmake .. -DFETCH_LIBS=0
 ```
 
 Build the project:
@@ -21,4 +29,3 @@ Build the project:
 ```bash
 cmake --build .
 ```
-
