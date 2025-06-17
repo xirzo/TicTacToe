@@ -92,7 +92,7 @@ void receive_server_message(game_state_t *state) {
   }
 }
 
-void init_buttons(button_t *btns, game_state_t *state) {
+void init_buttons(button_t *btns, game_state_t *state, Texture2D *texture) {
   float width = BOARD_SIDE * BOARD_BUTTON_SIZE + (BOARD_SIDE - 1) * BOARD_SPACING;
 
   float start_x = (float)SCREEN_WIDTH / 2 - width / 2;
@@ -105,7 +105,7 @@ void init_buttons(button_t *btns, game_state_t *state) {
                    start_y + j * (BOARD_BUTTON_SIZE + BOARD_SPACING) };
       vec2 size = { BOARD_BUTTON_SIZE, BOARD_BUTTON_SIZE };
 
-      button_init(btn, pos, size, INITIAL_COLOR, (void *)state, button_on_pressed);
+      button_init(btn, pos, size, INITIAL_COLOR, texture, (void *)state, button_on_pressed);
     }
   }
 }
@@ -118,14 +118,17 @@ void update_buttons(button_t *btns, game_state_t *state) {
       switch (state->cells[i][j]) {
         case CELL_EMPTY: {
           btn->color = INITIAL_COLOR;
+          btn->texture = state->empty_texture;
           break;
         }
         case CELL_PLAYER: {
           btn->color = PLAYER_COLOR;
+          btn->texture = state->circle_texture;
           break;
         }
         case CELL_ENEMY: {
           btn->color = ENEMY_COLOR;
+          btn->texture = state->cross_texture;
           break;
         }
       }
@@ -145,20 +148,35 @@ int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "TicTacToe");
   SetTargetFPS(FPS);
 
+  Texture2D circle_texture = LoadTexture("circle.png");
+  Texture2D cross_texture = LoadTexture("cross.png");
+  Texture2D empty_texture = LoadTexture("empty.png");
+
+  SetTextureFilter(circle_texture, TEXTURE_FILTER_POINT);
+  SetTextureFilter(cross_texture, TEXTURE_FILTER_POINT);
+  SetTextureFilter(empty_texture, TEXTURE_FILTER_POINT);
+
+  state.circle_texture = &circle_texture;
+  state.cross_texture = &cross_texture;
+  state.empty_texture = &empty_texture;
+
   button_t *btns = malloc(BOARD_SIDE * BOARD_SIDE * sizeof(button_t));
 
-  init_buttons(btns, &state);
+  init_buttons(btns, &state, NULL);
 
   button_t *restart_btn = malloc(sizeof(button_t));
+
   button_init(
       restart_btn,
       (vec2){ (float)SCREEN_WIDTH / 2 - (float)RESTART_BUTTON_WIDTH / 2,
               (float)SCREEN_HEIGHT / 2 + RESTART_BUTTON_OFFSET_Y },
       (vec2){ RESTART_BUTTON_WIDTH, RESTART_BUTTON_HEIGHT },
       WHITE,
+      NULL,
       &state,
       restart_on_pressed
   );
+
   while (!WindowShouldClose()) {
     receive_server_message(&state);
 
@@ -201,6 +219,9 @@ int main(void) {
     EndDrawing();
   }
 
+  UnloadTexture(cross_texture);
+  UnloadTexture(circle_texture);
+  UnloadTexture(empty_texture);
   free(btns);
   free(restart_btn);
   CloseWindow();

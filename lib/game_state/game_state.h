@@ -1,6 +1,7 @@
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
 
+#include <raylib.h>
 #include "types.h"
 #include "client.h"
 
@@ -13,6 +14,9 @@ typedef struct game_state {
   int waiting_for_response;
   int pending_x;
   int pending_y;
+  Texture2D *circle_texture;
+  Texture2D *cross_texture;
+  Texture2D *empty_texture;
 } game_state_t;
 
 typedef struct server_game_state {

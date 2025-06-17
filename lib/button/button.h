@@ -17,11 +17,20 @@ typedef struct button {
   vec2 pos;
   vec2 size;
   Color color;
+  Texture2D *texture;
   void *param;
   void (*callback)(button_t *btn);
 } button_t;
 
-void button_init(button_t *btn, vec2 pos, vec2 size, Color color, void *param, void (*callback)());
+void button_init(
+    button_t *btn,
+    vec2 pos,
+    vec2 size,
+    Color color,
+    Texture2D *texture,
+    void *param,
+    void (*callback)()
+);
 
 /*
   should be put inside of the drawing loop
