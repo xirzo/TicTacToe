@@ -64,18 +64,14 @@ void sr_destroy_server(server_t *server) {
   }
   pthread_mutex_unlock(&server->clients_mutex);
   pthread_mutex_destroy(&server->clients_mutex);
+  pthread_cancel(server->server_listen_thread);
+  pthread_join(server->server_listen_thread, NULL);
   close(server->fd);
   free(server);
 }
 
-void sr_start_listen(server_t *server) {
-  if (listen(server->fd, MAX_PLAYERS) < 0) {
-    perror("failed listening");
-    return;
-  }
-
-  printf("Server listening on port %d...\n", ntohs(server->servaddr.sin_port));
-  printf("Waiting for connections...\n");
+void *listen_thread_func(void *arg) {
+  server_t *server = (server_t *)arg;
 
   while (1) {
     struct sockaddr_in client_addr;
@@ -100,6 +96,19 @@ void sr_start_listen(server_t *server) {
 
     printf("Successfully added client with ID %d\n", client_id);
   }
+  return NULL;
+}
+
+void sr_start_listen(server_t *server) {
+  if (listen(server->fd, MAX_PLAYERS) < 0) {
+    perror("failed listening");
+    return;
+  }
+
+  printf("Server listening on port %d...\n", ntohs(server->servaddr.sin_port));
+  printf("Waiting for connections...\n");
+
+  pthread_create(&server->server_listen_thread, NULL, listen_thread_func, server);
 }
 
 int sr_add_client(server_t *server, int socket_fd, struct sockaddr_in addr) {

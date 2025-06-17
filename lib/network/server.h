@@ -42,6 +42,7 @@ typedef struct server {
   client_connection_t clients[MAX_PLAYERS];
   size_t client_count;
   pthread_mutex_t clients_mutex;
+  pthread_t server_listen_thread;
 
   void *(*handle_client_callback)(void *);
 } server_t;
