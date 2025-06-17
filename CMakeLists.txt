@@ -8,3 +8,5 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(bin)
 add_subdirectory(lib)
+
+file(COPY ${CMAKE_SOURCE_DIR}/start.sh DESTINATION ${CMAKE_BINARY_DIR}/bin)
