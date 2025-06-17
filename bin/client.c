@@ -3,10 +3,13 @@
 #include "raylib.h"
 #include <fcntl.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "game_state.h"
 #include "button.h"
+#include "server.h"
+#include "types.h"
 #include "vec2.h"
 
 void button_on_pressed(button_t *btn) {
@@ -21,9 +24,43 @@ void button_on_pressed(button_t *btn) {
   offset.x += 1.f;
   offset.y += 1.f;
 
-  state->cells[(int)offset.x][(int)offset.y] = CELL_CROSS;
+  int x = (int)offset.x;
+  int y = (int)offset.y;
 
-  btn->color = GREEN;
+  state->cells[x][y] = CELL_PLAYER;
+  btn->color = PLAYER_COLOR;
+
+  client_message_t msg = {
+    .type = CLIENT_MSG_SET_MARK,
+    .data.position = (vec2){ x, y },
+  };
+
+  sr_send_message_to_server(&state->client, &msg);
+}
+
+// TODO: maybe put a while loop so that you can`t move until new pos it set
+
+void receive_server_message(game_state_t *state) {
+  client_t *client = &state->client;
+  server_message_t msg;
+
+  if ((sr_receive_server_message(client, &msg)) < 0) {
+    return;
+  }
+
+  switch (msg.type) {
+    case SERVER_MSG_MARK_SET: {
+      fprintf(stderr, "Enemy mark set\n");
+      int x = (int)msg.data.position.x;
+      int y = (int)msg.data.position.y;
+      state->cells[x][y] = CELL_ENEMY;
+      break;
+    }
+    default: {
+      fprintf(stderr, "error: Wrong message server type\n");
+      break;
+    }
+  }
 }
 
 void init_buttons(button_t *btns, game_state_t *state) {
@@ -37,7 +74,32 @@ void init_buttons(button_t *btns, game_state_t *state) {
       vec2 offset = (vec2){ (i - 1) * 100, (j - 1) * 100 };
       vec2_subtract(&SCREEN_CENTER, &offset, &pos);
 
-      button_init(btn, pos, size, RED, (void *)state, button_on_pressed);
+      button_init(btn, pos, size, INITIAL_COLOR, (void *)state, button_on_pressed);
+    }
+  }
+}
+
+void update_buttons(button_t *btns, game_state_t *state) {
+  for (int i = 0; i < BOARD_SIDE; i++) {
+    for (int j = 0; j < BOARD_SIDE; j++) {
+      button_t *btn = &btns[i + BOARD_SIDE * j];
+
+      switch (state->cells[i][j]) {
+        case CELL_EMPTY: {
+          btn->color = INITIAL_COLOR;
+          break;
+        }
+        case CELL_PLAYER: {
+          btn->color = PLAYER_COLOR;
+          break;
+        }
+        case CELL_ENEMY: {
+          btn->color = ENEMY_COLOR;
+          break;
+        }
+      }
+
+      button_draw(btn);
     }
   }
 }
@@ -62,13 +124,13 @@ int main(void) {
       button_check(&btns[i]);
     }
 
+    receive_server_message(&state);
+
     BeginDrawing();
 
     ClearBackground(BLACK);
 
-    for (int i = 0; i < BOARD_SIDE * BOARD_SIDE; i++) {
-      button_draw(&btns[i]);
-    }
+    update_buttons(btns, &state);
 
     EndDrawing();
   }

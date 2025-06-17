@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// TODO: remove global_state
+
+static game_state_t g_state;
+
 void *handle_client(void *arg) {
   thread_args_t *args = (thread_args_t *)arg;
   server_t *server = args->server;
@@ -45,8 +49,9 @@ void *handle_client(void *arg) {
 
     switch (msg.type) {
       case CLIENT_MSG_SET_MARK: {
+        // TODO: check win condition here
         printf(
-            "Client %d position: (%.2f, %.2f)\n",
+            "Client %d set mark on: (%.2f, %.2f)\n",
             con->client_id,
             msg.data.position.x,
             msg.data.position.y
@@ -56,6 +61,7 @@ void *handle_client(void *arg) {
                                            .client_id = con->client_id,
                                            .timestamp = time(NULL),
                                            .data.position = msg.data.position };
+
         sr_send_message_to_all_except(server, con->client_id, &pos_broadcast);
         break;
       }
@@ -78,10 +84,12 @@ void *handle_client(void *arg) {
   return NULL;
 }
 
-int main(void) {
-  game_state_t state;
+int is_game_finished() {
+  return g_state.is_finished == 1;
+}
 
-  state_init(&state);
+int main(void) {
+  state_init(&g_state);
 
   server_t *server = sr_create_server(SERVER_PORT, handle_client);
 
@@ -91,6 +99,11 @@ int main(void) {
   }
 
   sr_start_listen(server);
+
+  printf("Starting game loop\n");
+
+  while (!is_game_finished()) {
+  }
 
   return 0;
 }

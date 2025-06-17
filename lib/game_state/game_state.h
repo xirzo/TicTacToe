@@ -8,8 +8,9 @@
 
 typedef struct game_state {
   board_cell cells[BOARD_SIDE][BOARD_SIDE];
-  player_role role;
+  player_role current_turn_role;
   client_t client;
+  int is_finished;
 } game_state_t;
 
 void state_init(game_state_t *state);

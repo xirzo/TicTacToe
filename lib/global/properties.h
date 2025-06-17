@@ -7,5 +7,8 @@
 #define SCREEN_CENTER (vec2){ (float)SCREEN_WIDTH / 2, (float)SCREEN_HEIGHT / 2 }
 #define SERVER_IP     "127.0.0.1"
 #define SERVER_PORT   8080
+#define INITIAL_COLOR BLUE
+#define PLAYER_COLOR  GREEN
+#define ENEMY_COLOR   RED
 
 #endif  // !PROPERTIES_H

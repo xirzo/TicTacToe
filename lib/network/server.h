@@ -11,7 +11,7 @@
 #define MAX_PLAYERS 2
 
 typedef enum {
-  SERVER_MSG_ROLE_SET = 1,
+  // SERVER_MSG_ROLE_SET = 1,
   SERVER_MSG_MARK_SET,
 } server_message_type;
 
