@@ -2,6 +2,8 @@
 
 A C multiplayer implementation of the Tic-Tac-Toe game. Includes a server and a client.
 
+![image](https://github.com/user-attachments/assets/7360d829-a9dc-48a0-b81b-d6062b25f887)
+
 ## Build Instructions
 
 Create a build directory:
