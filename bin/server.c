@@ -9,7 +9,7 @@ int main(void) {
 
   state_init(&state);
 
-  server_t *server = sr_create_server(g_Properties.SERVER_PORT);
+  server_t *server = sr_create_server(SERVER_PORT);
 
   if (!server) {
     fprintf(stderr, "error: Failed to create server\n");

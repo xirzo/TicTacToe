@@ -12,9 +12,6 @@
 void button_on_pressed(button_t *btn) {
   printf("Button pressed: x: %f y: %f\n", btn->pos.x, btn->pos.y);
 
-  const vec2 SCREEN_CENTER = { (float)g_Properties.SCREEN_WIDTH / 2,
-                               (float)g_Properties.SCREEN_HEIGHT / 2 };
-
   game_state_t *state = (game_state_t *)btn->param;
 
   vec2 offset;
@@ -31,7 +28,7 @@ void button_on_pressed(button_t *btn) {
   btn->color = GREEN;
 }
 
-void init_buttons(button_t *btns, const vec2 *screen_center, game_state_t *state) {
+void init_buttons(button_t *btns, game_state_t *state) {
   for (int i = 0; i < BOARD_SIDE; i++) {
     for (int j = 0; j < BOARD_SIDE; j++) {
       button_t *btn = &btns[i + BOARD_SIDE * j];
@@ -39,7 +36,7 @@ void init_buttons(button_t *btns, const vec2 *screen_center, game_state_t *state
       // TODO: 2. make offset automatic (replace constants)
       vec2 pos;
       vec2 offset = (vec2){ (i - 1) * 100, (j - 1) * 100 };
-      vec2_subtract(screen_center, &offset, &pos);
+      vec2_subtract(&SCREEN_CENTER, &offset, &pos);
 
       vec2 size = (vec2){ 80, 80 };
       button_init(btn, pos, size, RED, (void *)state, button_on_pressed);
@@ -48,20 +45,17 @@ void init_buttons(button_t *btns, const vec2 *screen_center, game_state_t *state
 }
 
 int main(void) {
-  const vec2 SCREEN_CENTER = { (float)g_Properties.SCREEN_WIDTH / 2,
-                               (float)g_Properties.SCREEN_HEIGHT / 2 };
-
   game_state_t state;
 
   state_init(&state);
 
-  InitWindow(g_Properties.SCREEN_WIDTH, g_Properties.SCREEN_HEIGHT, "TicTacToe");
+  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "TicTacToe");
 
-  SetTargetFPS(60);
+  SetTargetFPS(FPS);
 
   button_t *btns = malloc(BOARD_SIDE * BOARD_SIDE * sizeof(button_t));
 
-  init_buttons(btns, &SCREEN_CENTER, &state);
+  init_buttons(btns, &state);
 
   while (!WindowShouldClose()) {
     for (int i = 0; i < BOARD_SIDE * BOARD_SIDE; i++) {
