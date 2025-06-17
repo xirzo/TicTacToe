@@ -1,8 +1,8 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#include "types.h"
 #include "vec2.h"
-#include "game_state.h"
 #include <netinet/in.h>
 #include <pthread.h>
 #include <stddef.h>

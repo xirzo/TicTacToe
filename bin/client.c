@@ -3,7 +3,6 @@
 #include "raylib.h"
 #include <fcntl.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "game_state.h"
@@ -11,8 +10,6 @@
 #include "vec2.h"
 
 void button_on_pressed(button_t *btn) {
-  printf("Button pressed: x: %.1f y: %.1f\n", btn->pos.x, btn->pos.y);
-
   game_state_t *state = (game_state_t *)btn->param;
 
   vec2 offset;
@@ -50,9 +47,7 @@ int main(void) {
 
   state_init(&state);
 
-  client_t *client = malloc(sizeof(client_t));
-
-  sr_client_connect(client, SERVER_IP, SERVER_PORT);
+  sr_client_connect(&state.client, SERVER_IP, SERVER_PORT);
 
   SetTraceLogLevel(LOG_ERROR);
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "TicTacToe");

@@ -29,7 +29,6 @@ typedef struct client {
 int sr_send_message_to_server(client_t *client, const client_message_t *msg);
 void sr_client_close(client_t *client);
 int sr_receive_server_message(client_t *client, server_message_t *msg);
-int sr_client_connect(client_t *client, const char *server_ip,
-                      unsigned short port);
+int sr_client_connect(client_t *client, const char *server_ip, unsigned short port);
 
-#endif // !CLIENT_H
+#endif  // !CLIENT_H

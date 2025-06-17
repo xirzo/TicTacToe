@@ -1,5 +1,6 @@
 add_subdirectory(button)
+add_subdirectory(game_state)
+add_subdirectory(global)
 add_subdirectory(input)
 add_subdirectory(math)
 add_subdirectory(network)
-add_subdirectory(game_state)
