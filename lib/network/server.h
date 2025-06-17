@@ -7,12 +7,11 @@
 #include <pthread.h>
 #include <stddef.h>
 #include <unistd.h>
-
-#define MAX_PLAYERS 2
+#include "properties.h"
 
 typedef enum {
-  // SERVER_MSG_ROLE_SET = 1,
   SERVER_MSG_MARK_SET,
+  SERVER_MSG_MARK_GAME_END,
 } server_message_type;
 
 typedef struct server_message {

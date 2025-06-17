@@ -7,6 +7,5 @@ void state_init(game_state_t *state) {
     }
   }
 
-  state->current_turn_role = PLAYER_UNSET;
   state->is_finished = 0;
 }

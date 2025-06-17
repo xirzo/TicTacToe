@@ -15,30 +15,29 @@
 void button_on_pressed(button_t *btn) {
   game_state_t *state = (game_state_t *)btn->param;
 
-  vec2 offset;
-  vec2_subtract(&SCREEN_CENTER, &btn->pos, &offset);
+  float width = BOARD_SIDE * BOARD_BUTTON_SIZE + (BOARD_SIDE - 1) * BOARD_SPACING;
 
-  // TODO: 1. make offset automatic (replace constants)
-  vec2_multiply_scalar(&offset, 1.f / 100);
+  float start_y = (float)SCREEN_WIDTH / 2 - width / 2;
+  float start_x = (float)SCREEN_HEIGHT / 2 - width / 2;
 
-  offset.x += 1.f;
-  offset.y += 1.f;
+  float relative_x = btn->pos.x - start_y;
+  float relative_y = btn->pos.y - start_x;
 
-  int x = (int)offset.x;
-  int y = (int)offset.y;
+  int x = (int)(relative_x / (BOARD_BUTTON_SIZE + BOARD_SPACING));
+  int y = (int)(relative_y / (BOARD_BUTTON_SIZE + BOARD_SPACING));
 
-  state->cells[x][y] = CELL_PLAYER;
-  btn->color = PLAYER_COLOR;
+  if (x >= 0 && x < BOARD_SIDE && y >= 0 && y < BOARD_SIDE && state->cells[x][y] == CELL_EMPTY) {
+    state->cells[x][y] = CELL_PLAYER;
+    btn->color = PLAYER_COLOR;
 
-  client_message_t msg = {
-    .type = CLIENT_MSG_SET_MARK,
-    .data.position = (vec2){ x, y },
-  };
+    client_message_t msg = {
+      .type = CLIENT_MSG_SET_MARK,
+      .data.position = (vec2){ x, y },
+    };
 
-  sr_send_message_to_server(&state->client, &msg);
+    sr_send_message_to_server(&state->client, &msg);
+  }
 }
-
-// TODO: maybe put a while loop so that you can`t move until new pos it set
 
 void receive_server_message(game_state_t *state) {
   client_t *client = &state->client;
@@ -56,6 +55,11 @@ void receive_server_message(game_state_t *state) {
       state->cells[x][y] = CELL_ENEMY;
       break;
     }
+    case SERVER_MSG_MARK_GAME_END: {
+      fprintf(stderr, "Game finished\n");
+      state->is_finished = 1;
+      break;
+    }
     default: {
       fprintf(stderr, "error: Wrong message server type\n");
       break;
@@ -64,15 +68,17 @@ void receive_server_message(game_state_t *state) {
 }
 
 void init_buttons(button_t *btns, game_state_t *state) {
+  float width = BOARD_SIDE * BOARD_BUTTON_SIZE + (BOARD_SIDE - 1) * BOARD_SPACING;
+
+  float start_x = (float)SCREEN_WIDTH / 2 - width / 2;
+  float start_y = (float)SCREEN_HEIGHT / 2 - width / 2;
+
   for (int i = 0; i < BOARD_SIDE; i++) {
     for (int j = 0; j < BOARD_SIDE; j++) {
       button_t *btn = &btns[i + BOARD_SIDE * j];
-
-      // TODO: 2. make offset automatic (replace constants)
-      vec2 pos;
-      vec2 size = (vec2){ 80, 80 };
-      vec2 offset = (vec2){ (i - 1) * 100, (j - 1) * 100 };
-      vec2_subtract(&SCREEN_CENTER, &offset, &pos);
+      vec2 pos = { start_x + i * (BOARD_BUTTON_SIZE + BOARD_SPACING),
+                   start_y + j * (BOARD_BUTTON_SIZE + BOARD_SPACING) };
+      vec2 size = { BOARD_BUTTON_SIZE, BOARD_BUTTON_SIZE };
 
       button_init(btn, pos, size, INITIAL_COLOR, (void *)state, button_on_pressed);
     }
@@ -98,7 +104,6 @@ void update_buttons(button_t *btns, game_state_t *state) {
           break;
         }
       }
-
       button_draw(btn);
     }
   }
@@ -120,8 +125,10 @@ int main(void) {
   init_buttons(btns, &state);
 
   while (!WindowShouldClose()) {
-    for (int i = 0; i < BOARD_SIDE * BOARD_SIDE; i++) {
-      button_check(&btns[i]);
+    if (!state.is_finished) {
+      for (int i = 0; i < BOARD_SIDE * BOARD_SIDE; i++) {
+        button_check(&btns[i]);
+      }
     }
 
     receive_server_message(&state);
@@ -130,7 +137,15 @@ int main(void) {
 
     ClearBackground(BLACK);
 
-    update_buttons(btns, &state);
+    if (!state.is_finished) {
+      update_buttons(btns, &state);
+    }
+
+    if (state.is_finished) {
+      const char *text = "Game Finished!";
+      int text_width = MeasureText(text, FONT_SIZE);
+      DrawText(text, SCREEN_WIDTH / 2 - text_width / 2, SCREEN_HEIGHT / 2, FONT_SIZE, WHITE);
+    }
 
     EndDrawing();
   }
@@ -139,3 +154,5 @@ int main(void) {
   CloseWindow();
   return 0;
 }
+
+// TODO: restart

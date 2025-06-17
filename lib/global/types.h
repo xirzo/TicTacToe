@@ -4,7 +4,6 @@
 typedef enum {
   PLAYER_CIRCLE = 0,
   PLAYER_CROSS = 1,
-  PLAYER_UNSET,
 } player_role;
 
 typedef enum {
