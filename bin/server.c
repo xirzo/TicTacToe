@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
 
 // TODO: remove global_state
 
@@ -31,19 +32,9 @@ int main(void) {
 
   printf("Starting game loop\n");
 
-  while (!is_game_finished()) {
-    // switch (g_state.turn_role) {
-    //   case PLAYER_CIRCLE: {
-    //     break;
-    //   }
-    //   case PLAYER_CROSS: {
-    //     break;
-    //   }
-    // }
-  }
-
   while (1) {
-    // waiting for restart
+    if (g_state.is_finished) {
+    }
   }
 
   return 0;
@@ -91,6 +82,20 @@ void *handle_client(void *arg) {
               msg.data.position.y
           );
           break;
+        }
+
+        switch (con->client_type) {
+          case PLAYER_CIRCLE: {
+            printf("Changed role to: CROSS\n");
+            g_state.turn_role = PLAYER_CROSS;
+            break;
+          }
+          case PLAYER_CROSS: {
+            printf("Changed role to: CIRCLE\n");
+
+            g_state.turn_role = PLAYER_CIRCLE;
+            break;
+          }
         }
 
         printf(
@@ -145,6 +150,8 @@ void *handle_client(void *arg) {
         printf("Unknown message type %d from client %d\n", msg.type, con->client_id);
         break;
       }
+
+        printf("a\n");
     }
   }
 
@@ -245,8 +252,4 @@ int check_draw() {
   }
 
   return !check_win();
-}
-
-int is_game_finished() {
-  return g_state.is_finished == 1;
 }

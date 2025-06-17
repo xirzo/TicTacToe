@@ -28,6 +28,8 @@ void button_on_pressed(button_t *btn) {
   int x = (int)(relative_x / (BOARD_BUTTON_SIZE + BOARD_SPACING));
   int y = (int)(relative_y / (BOARD_BUTTON_SIZE + BOARD_SPACING));
 
+  state->waiting_for_response = 0;
+
   if (x >= 0 && x < BOARD_SIDE && y >= 0 && y < BOARD_SIDE && state->cells[x][y] == CELL_EMPTY
       && !state->waiting_for_response) {
     client_message_t set_mark_msg = {
