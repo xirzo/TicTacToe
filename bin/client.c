@@ -13,6 +13,8 @@
 #include "types.h"
 #include "vec2.h"
 
+void restart_on_pressed(button_t *btn) {}
+
 void button_on_pressed(button_t *btn) {
   game_state_t *state = (game_state_t *)btn->param;
 
@@ -131,6 +133,16 @@ int main(void) {
 
   init_buttons(btns, &state);
 
+  button_t *restart_btn = malloc(sizeof(button_t));
+  button_init(
+      restart_btn,
+      (vec2){ (float)SCREEN_WIDTH / 2 - (float)RESTART_BUTTON_WIDTH / 2,
+              (float)SCREEN_HEIGHT / 2 + RESTART_BUTTON_OFFSET_Y },
+      (vec2){ RESTART_BUTTON_WIDTH, RESTART_BUTTON_HEIGHT },
+      WHITE,
+      &state,
+      restart_on_pressed
+  );
   while (!WindowShouldClose()) {
     if (!state.is_finished) {
       for (int i = 0; i < BOARD_SIDE * BOARD_SIDE; i++) {
@@ -139,6 +151,10 @@ int main(void) {
     }
 
     receive_server_message(&state);
+
+    if (state.is_finished) {
+      button_check(restart_btn);
+    }
 
     BeginDrawing();
 
@@ -152,12 +168,26 @@ int main(void) {
       const char *text = "Game Finished!";
       int text_width = MeasureText(text, FONT_SIZE);
       DrawText(text, SCREEN_WIDTH / 2 - text_width / 2, SCREEN_HEIGHT / 2, FONT_SIZE, WHITE);
+
+      button_draw(restart_btn);
+
+      const char *restart_text = "Restart";
+      int restart_text_width = MeasureText(restart_text, RESTART_BUTTON_TEXT_SIZE);
+      DrawText(
+          restart_text,
+          SCREEN_WIDTH / 2 - restart_text_width / 2,
+          SCREEN_HEIGHT / 2 + RESTART_BUTTON_OFFSET_Y
+              + (RESTART_BUTTON_HEIGHT - RESTART_BUTTON_TEXT_SIZE) / 2,
+          RESTART_BUTTON_TEXT_SIZE,
+          BLACK
+      );
     }
 
     EndDrawing();
   }
 
   free(btns);
+  free(restart_btn);
   CloseWindow();
   return 0;
 }
