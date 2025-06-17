@@ -10,11 +10,12 @@
 #define MAX_PLAYERS 2
 
 typedef enum {
-  SERVER_MSG_PADDLE_POSITION_UPDATE = 1,
-  SERVER_MSG_BALL_POSITION_UPDATE = 2,
-  SERVER_MSG_PLAYER_JOINED = 3,
-  SERVER_MSG_PLAYER_LEFT = 4,
-  SERVER_MSG_IS_MAIN = 5,
+  CLIENT_CIRCLE = 0,
+  CLIENT_CROSS = 1,
+} client_type;
+
+typedef enum {
+  SERVER_MSG_MARK_SET = 1,
 } server_message_type;
 
 typedef struct server_message {
@@ -23,11 +24,6 @@ typedef struct server_message {
   unsigned int timestamp;
   union {
     vec2 position;
-    char text[256];
-    struct {
-      int player_id;
-      char player_name[32];
-    } player_info;
   } data;
 } server_message_t;
 
@@ -37,10 +33,8 @@ typedef struct client_connection {
   int active;
   int is_main;
   pthread_t thread_id;
+  client_type client_type;
   int client_id;
-
-  vec2 paddle_position;
-  vec2 ball_position;
 } client_connection_t;
 
 typedef struct server {

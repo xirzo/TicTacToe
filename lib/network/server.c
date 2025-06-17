@@ -1,18 +1,9 @@
 #include "server.h"
 #include "client.h"
 #include <arpa/inet.h>
-#include <fcntl.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <pthread.h>
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <time.h>
 #include <unistd.h>
 
 #define BUFSIZE 1024
@@ -123,16 +114,6 @@ void *handle_client(void *arg) {
   printf("Client %d connected from %s\n", con->client_id,
          inet_ntoa(con->addr.sin_addr));
 
-  if (con->client_id == 0) {
-    server_message_t is_main_msg = {
-        .type = SERVER_MSG_IS_MAIN,
-        .client_id = con->client_id,
-        .timestamp = time(NULL),
-    };
-
-    sr_send_message_to_client(server, con->client_id, &is_main_msg);
-  }
-
   while (con->active) {
     client_message_t msg;
     ssize_t bytes_read = read(con->socket_fd, &msg, sizeof(client_message_t));
@@ -144,33 +125,12 @@ void *handle_client(void *arg) {
 
     if (bytes_read == sizeof(client_message_t)) {
       switch (msg.type) {
-      case CLIENT_MSG_PADDLE_POSITION: {
+      case CLIENT_MSG_SET_MARK: {
 
         printf("Client %d position: (%.2f, %.2f)\n", con->client_id,
                msg.data.position.x, msg.data.position.y);
 
-        con->paddle_position = msg.data.position;
-
-        server_message_t pos_broadcast = {.type =
-                                              SERVER_MSG_PADDLE_POSITION_UPDATE,
-                                          .client_id = con->client_id,
-                                          .timestamp = time(NULL),
-                                          .data.position = msg.data.position};
-        sr_send_message_to_all_except(server, con->client_id, &pos_broadcast);
-        break;
-      }
-      case CLIENT_MSG_BALL_POSITION: {
-        if (con->client_id != 0) {
-          break;
-        }
-
-        printf("Ball from client: %d position: (%.2f, %.2f)\n", con->client_id,
-               msg.data.position.x, msg.data.position.y);
-
-        con->ball_position = msg.data.position;
-
-        server_message_t pos_broadcast = {.type =
-                                              SERVER_MSG_BALL_POSITION_UPDATE,
+        server_message_t pos_broadcast = {.type = SERVER_MSG_MARK_SET,
                                           .client_id = con->client_id,
                                           .timestamp = time(NULL),
                                           .data.position = msg.data.position};
@@ -185,11 +145,6 @@ void *handle_client(void *arg) {
       }
     }
   }
-
-  server_message_t goodbye_msg = {.type = SERVER_MSG_PLAYER_LEFT,
-                                  .client_id = con->client_id,
-                                  .timestamp = time(NULL)};
-  sr_send_message_to_all_except(server, con->client_id, &goodbye_msg);
 
   close(con->socket_fd);
   con->active = 0;
@@ -220,6 +175,7 @@ int sr_add_client(server_t *server, int socket_fd, struct sockaddr_in addr) {
     con->addr = addr;
     con->active = 1;
     con->client_id = i;
+    con->client_type = i % 2;
 
     thread_args_t *args = malloc(sizeof(thread_args_t));
     args->client_index = i;
@@ -282,3 +238,5 @@ void sr_send_message_to_client(server_t *server, int client_id,
 
   pthread_mutex_unlock(&server->clients_mutex);
 }
+
+// TODO: add logger

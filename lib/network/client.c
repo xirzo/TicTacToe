@@ -6,8 +6,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-int sr_client_connect(Client *client, const char *server_ip,
-                      unsigned short port) {
+int sr_client_connect(client_t *client, const char *server_ip, unsigned short port) {
   if (!server_ip) {
     printf("ip is NULL\n");
     return -1;
@@ -29,8 +28,10 @@ int sr_client_connect(Client *client, const char *server_ip,
     return -1;
   }
 
-  if (connect(client->server_fd, (struct sockaddr *)&client->server_addr,
-              sizeof(client->server_addr)) < 0) {
+  if (connect(
+          client->server_fd, (struct sockaddr *)&client->server_addr, sizeof(client->server_addr)
+      )
+      < 0) {
     printf("connection with the server failed...\n");
     return -1;
   }
@@ -39,9 +40,11 @@ int sr_client_connect(Client *client, const char *server_ip,
   return 0;
 }
 
-void sr_client_close(Client *client) { close(client->server_fd); }
+void sr_client_close(client_t *client) {
+  close(client->server_fd);
+}
 
-int sr_receive_server_message(Client *client, ServerMessage *msg) {
+int sr_receive_server_message(client_t *client, server_message_t *msg) {
   if (!client || !msg) {
     return -1;
   }
@@ -54,9 +57,9 @@ int sr_receive_server_message(Client *client, ServerMessage *msg) {
     made_nonblocking = 1;
   }
 
-  ssize_t bytes_read = recv(client->server_fd, msg, sizeof(ServerMessage), 0);
+  ssize_t bytes_read = recv(client->server_fd, msg, sizeof(server_message_t), 0);
 
-  if (bytes_read == sizeof(ServerMessage)) {
+  if (bytes_read == sizeof(server_message_t)) {
     return 0;
   } else if (bytes_read == 0) {
     return -1;
@@ -70,14 +73,14 @@ int sr_receive_server_message(Client *client, ServerMessage *msg) {
   }
 }
 
-int sr_send_message_to_server(Client *client, const ClientMessage *msg) {
+int sr_send_message_to_server(client_t *client, const client_message_t *msg) {
   if (!client || !msg) {
     return -1;
   }
 
-  ssize_t bytes_sent = send(client->server_fd, msg, sizeof(ClientMessage), 0);
+  ssize_t bytes_sent = send(client->server_fd, msg, sizeof(client_message_t), 0);
 
-  if (bytes_sent != sizeof(ClientMessage)) {
+  if (bytes_sent != sizeof(client_message_t)) {
     perror("ERROR in sr_send_message_to_server");
     return -2;
   }

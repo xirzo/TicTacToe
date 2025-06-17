@@ -7,9 +7,7 @@
 #include <sys/socket.h>
 
 typedef enum {
-  CLIENT_MSG_PADDLE_POSITION = 1,
-  CLIENT_MSG_BALL_POSITION = 2,
-  CLIENT_MSG_DISCONNECT = 3
+  CLIENT_MSG_SET_MARK = 1,
 } client_message_type;
 
 typedef struct client_message {

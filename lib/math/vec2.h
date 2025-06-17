@@ -10,4 +10,4 @@ void vec2_multiply(vec2 *v, float f);
 float vec2_magnitude(vec2 *v);
 void vec2_normalize(vec2 *v);
 
-#endif // !VEC_2_H
+#endif  // !VEC_2_H
