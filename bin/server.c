@@ -13,7 +13,6 @@
 
 static server_game_state_t g_state;
 
-static int is_game_finished();
 static void *handle_client(void *arg);
 static int check_win();
 static int check_draw();
@@ -33,8 +32,6 @@ int main(void) {
   printf("Starting game loop\n");
 
   while (1) {
-    if (g_state.is_finished) {
-    }
   }
 
   return 0;
@@ -73,6 +70,20 @@ void *handle_client(void *arg) {
     }
 
     switch (msg.type) {
+      case CLIENT_MSG_RESTART: {
+        printf("Client %d initialized game restart\n", con->client_id);
+        server_state_init(&g_state);
+
+        server_message_t restart_msg = {
+          .type = SERVER_MSG_RESTART,
+          .client_id = con->client_id,
+          .timestamp = time(NULL),
+        };
+
+        sr_send_message_to_all(server, &restart_msg);
+
+        break;
+      }
       case CLIENT_MSG_SET_MARK: {
         if (g_state.turn_role != con->client_type) {
           printf(

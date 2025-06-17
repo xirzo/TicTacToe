@@ -13,7 +13,17 @@
 #include "types.h"
 #include "vec2.h"
 
-void restart_on_pressed(button_t *btn) {}
+void restart_on_pressed(button_t *btn) {
+  game_state_t *state = (game_state_t *)btn->param;
+
+  client_message_t restart_msg = {
+    .type = CLIENT_MSG_RESTART,
+  };
+
+  if (sr_send_message_to_server(&state->client, &restart_msg) != 0) {
+    fprintf(stderr, "error: Failed to send restart request\n");
+  }
+}
 
 void button_on_pressed(button_t *btn) {
   game_state_t *state = (game_state_t *)btn->param;
@@ -54,6 +64,10 @@ void receive_server_message(game_state_t *state) {
   }
 
   switch (msg.type) {
+    case SERVER_MSG_RESTART: {
+      state_init(state);
+      break;
+    }
     case SERVER_MSG_ALLOW: {
       if (state->waiting_for_response) {
         state->cells[state->pending_x][state->pending_y] = CELL_PLAYER;
@@ -146,20 +160,19 @@ int main(void) {
       restart_on_pressed
   );
   while (!WindowShouldClose()) {
+    receive_server_message(&state);
+
     if (!state.is_finished) {
       for (int i = 0; i < BOARD_SIDE * BOARD_SIDE; i++) {
         button_check(&btns[i]);
       }
     }
 
-    receive_server_message(&state);
-
     if (state.is_finished) {
       button_check(restart_btn);
     }
 
     BeginDrawing();
-
     ClearBackground(BLACK);
 
     if (!state.is_finished) {
@@ -193,5 +206,3 @@ int main(void) {
   CloseWindow();
   return 0;
 }
-
-// TODO: restart
