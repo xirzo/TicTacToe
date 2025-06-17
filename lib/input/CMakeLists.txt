@@ -1,5 +1,3 @@
-add_library(input input_handler.cpp input_handler.h)
+add_library(input STATIC input.c)
 
-target_link_libraries(input PRIVATE game)
-
-target_include_directories(game PUBLIC ../game/)
+target_include_directories(input PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

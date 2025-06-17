@@ -1,40 +1,31 @@
-# Tic-Tac-Toe
+# TicTacToe
 
-A C++ implementation of the classic Tic-Tac-Toe game built using modern C++
-The project is organized into several components:
-
-## Project Structure
-
-The project is organized into several components:
-- `bin/` - Contains the main executable
-- `lib/` - Contains the core game libraries:
-  - `board/` - Board representation and logic
-  - `game/` - Game mechanics and rules
-  - `input/` - User input handling
-- `tests/` - Unit tests (optional)
-
-## Prerequisites
-
-- CMake (minimum version 3.5.0)
-- C++ 23 compatible compiler
-- Build tools (Make, etc.)
+A C multiplayer implementation of the Tic-Tac-Toe game. Includes a server and a client.
 
 ## Build Instructions
 
 Create a build directory:
+
 ```bash
 mkdir build && cd build
 ```
+
 Generate build files:
+
 ```bash
-cmake ..
+cmake .. -DFETCH_LIBS=1
+```
+
+or
+
+```bash
+# (!IMPORTANT) you should have [raylib](https://github.com/raysan5/raylib) installed on your computer
+
+cmake .. -DFETCH_LIBS=0
 ```
 
 Build the project:
+
 ```bash
 cmake --build .
 ```
-
-To enable tests, build with:
-
-cmake -DBUILD_TESTS=ON ..
