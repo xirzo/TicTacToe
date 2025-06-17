@@ -1,5 +1,4 @@
 #include "server.h"
-#include "client.h"
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +7,7 @@
 
 #define BUFSIZE 1024
 
-server_t *sr_create_server(unsigned short port) {
+server_t *sr_create_server(unsigned short port, void *(*handle_client_callback)(void *)) {
   server_t *server = malloc(sizeof(server_t));
 
   if (!server) {
@@ -28,13 +27,12 @@ server_t *sr_create_server(unsigned short port) {
   server->servaddr.sin_family = AF_INET;
   server->servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
   server->servaddr.sin_port = htons(port);
+  server->handle_client_callback = handle_client_callback;
 
   int optval = 1;
-  setsockopt(server->fd, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval,
-             sizeof(int));
+  setsockopt(server->fd, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval, sizeof(int));
 
-  if (bind(server->fd, (const struct sockaddr *)&server->servaddr,
-           sizeof(server->servaddr)) < 0) {
+  if (bind(server->fd, (const struct sockaddr *)&server->servaddr, sizeof(server->servaddr)) < 0) {
     perror("bind failed");
     close(server->fd);
     free(server);
@@ -83,16 +81,14 @@ void sr_start_listen(server_t *server) {
     struct sockaddr_in client_addr;
     socklen_t client_len = sizeof(client_addr);
 
-    int client_fd =
-        accept(server->fd, (struct sockaddr *)&client_addr, &client_len);
+    int client_fd = accept(server->fd, (struct sockaddr *)&client_addr, &client_len);
 
     if (client_fd < 0) {
       perror("failed to accept connection");
       continue;
     }
 
-    printf("New connection accepted from %s\n",
-           inet_ntoa(client_addr.sin_addr));
+    printf("New connection accepted from %s\n", inet_ntoa(client_addr.sin_addr));
 
     int client_id = sr_add_client(server, client_fd, client_addr);
 
@@ -104,57 +100,6 @@ void sr_start_listen(server_t *server) {
 
     printf("Successfully added client with ID %d\n", client_id);
   }
-}
-
-void *handle_client(void *arg) {
-  thread_args_t *args = (thread_args_t *)arg;
-  server_t *server = args->server;
-  client_connection_t *con = &server->clients[args->client_index];
-
-  printf("Client %d connected from %s\n", con->client_id,
-         inet_ntoa(con->addr.sin_addr));
-
-  while (con->active) {
-    client_message_t msg;
-    ssize_t bytes_read = read(con->socket_fd, &msg, sizeof(client_message_t));
-
-    if (bytes_read <= 0) {
-      printf("Client %d disconnected\n", con->client_id);
-      break;
-    }
-
-    if (bytes_read == sizeof(client_message_t)) {
-      switch (msg.type) {
-      case CLIENT_MSG_SET_MARK: {
-
-        printf("Client %d position: (%.2f, %.2f)\n", con->client_id,
-               msg.data.position.x, msg.data.position.y);
-
-        server_message_t pos_broadcast = {.type = SERVER_MSG_MARK_SET,
-                                          .client_id = con->client_id,
-                                          .timestamp = time(NULL),
-                                          .data.position = msg.data.position};
-        sr_send_message_to_all_except(server, con->client_id, &pos_broadcast);
-        break;
-      }
-      default: {
-        printf("Unknown message type %d from client %d\n", msg.type,
-               con->client_id);
-        break;
-      }
-      }
-    }
-  }
-
-  close(con->socket_fd);
-  con->active = 0;
-
-  pthread_mutex_lock(&server->clients_mutex);
-  server->client_count--;
-  pthread_mutex_unlock(&server->clients_mutex);
-
-  free(arg);
-  return NULL;
 }
 
 int sr_add_client(server_t *server, int socket_fd, struct sockaddr_in addr) {
@@ -181,8 +126,10 @@ int sr_add_client(server_t *server, int socket_fd, struct sockaddr_in addr) {
     args->client_index = i;
     args->server = server;
 
-    if (pthread_create(&server->clients[i].thread_id, NULL, handle_client,
-                       (void *)args) < 0) {
+    if (pthread_create(
+            &server->clients[i].thread_id, NULL, server->handle_client_callback, (void *)args
+        )
+        < 0) {
       con->active = 0;
       free(args);
       pthread_mutex_unlock(&server->clients_mutex);
@@ -210,13 +157,15 @@ void sr_send_message_to_all(server_t *server, const server_message_t *message) {
   pthread_mutex_unlock(&server->clients_mutex);
 }
 
-void sr_send_message_to_all_except(server_t *server, int except_client_id,
-                                   const server_message_t *message) {
+void sr_send_message_to_all_except(
+    server_t *server,
+    int except_client_id,
+    const server_message_t *message
+) {
   pthread_mutex_lock(&server->clients_mutex);
 
   for (int i = 0; i < MAX_PLAYERS; i++) {
-    if (server->clients[i].active &&
-        server->clients[i].client_id != except_client_id) {
+    if (server->clients[i].active && server->clients[i].client_id != except_client_id) {
       send(server->clients[i].socket_fd, message, sizeof(server_message_t), 0);
     }
   }
@@ -224,13 +173,11 @@ void sr_send_message_to_all_except(server_t *server, int except_client_id,
   pthread_mutex_unlock(&server->clients_mutex);
 }
 
-void sr_send_message_to_client(server_t *server, int client_id,
-                               const server_message_t *message) {
+void sr_send_message_to_client(server_t *server, int client_id, const server_message_t *message) {
   pthread_mutex_lock(&server->clients_mutex);
 
   for (int i = 0; i < MAX_PLAYERS; i++) {
-    if (server->clients[i].active &&
-        server->clients[i].client_id == client_id) {
+    if (server->clients[i].active && server->clients[i].client_id == client_id) {
       send(server->clients[i].socket_fd, message, sizeof(server_message_t), 0);
       break;
     }

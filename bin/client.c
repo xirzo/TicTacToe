@@ -1,3 +1,4 @@
+#include "client.h"
 #include "properties.h"
 #include "raylib.h"
 #include <fcntl.h>
@@ -10,7 +11,7 @@
 #include "vec2.h"
 
 void button_on_pressed(button_t *btn) {
-  printf("Button pressed: x: %f y: %f\n", btn->pos.x, btn->pos.y);
+  printf("Button pressed: x: %.1f y: %.1f\n", btn->pos.x, btn->pos.y);
 
   game_state_t *state = (game_state_t *)btn->param;
 
@@ -35,10 +36,10 @@ void init_buttons(button_t *btns, game_state_t *state) {
 
       // TODO: 2. make offset automatic (replace constants)
       vec2 pos;
+      vec2 size = (vec2){ 80, 80 };
       vec2 offset = (vec2){ (i - 1) * 100, (j - 1) * 100 };
       vec2_subtract(&SCREEN_CENTER, &offset, &pos);
 
-      vec2 size = (vec2){ 80, 80 };
       button_init(btn, pos, size, RED, (void *)state, button_on_pressed);
     }
   }
@@ -49,8 +50,12 @@ int main(void) {
 
   state_init(&state);
 
-  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "TicTacToe");
+  client_t *client = malloc(sizeof(client_t));
 
+  sr_client_connect(client, SERVER_IP, SERVER_PORT);
+
+  SetTraceLogLevel(LOG_ERROR);
+  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "TicTacToe");
   SetTargetFPS(FPS);
 
   button_t *btns = malloc(BOARD_SIDE * BOARD_SIDE * sizeof(button_t));

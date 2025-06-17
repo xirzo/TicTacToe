@@ -6,4 +6,6 @@ void state_init(game_state_t *state) {
       state->cells[i][j] = CELL_EMPTY;
     }
   }
+
+  state->role = PLAYER_UNSET;
 }
