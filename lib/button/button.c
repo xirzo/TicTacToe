@@ -1,16 +1,16 @@
 #include "button.h"
 
-#include "raylib.h"
-
-void button_init(button_t *btn, vec2 pos, vec2 size, void (*callback)()) {
+void button_init(button_t *btn, vec2 pos, vec2 size, Color color, void *param, void (*callback)()) {
   btn->state = -1;
   btn->pos = pos;
   btn->size = size;
+  btn->color = color;
+  btn->param = param;
   btn->callback = callback;
 }
 
 void button_draw(button_t *btn) {
-  DrawRectangle(btn->pos.x, btn->pos.y, btn->size.x, btn->size.y, RED);
+  DrawRectangle(btn->pos.x, btn->pos.y, btn->size.x, btn->size.y, btn->color);
 }
 
 void button_check(button_t *btn) {
