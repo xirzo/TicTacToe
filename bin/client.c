@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <logger.h>
 
 #include "game_state.h"
 #include "button.h"
@@ -140,6 +141,13 @@ void update_buttons(button_t *btns, game_state_t *state) {
 int main(void) {
   game_state_t state;
 
+  FILE *output = fopen("log.txt", "w");
+
+  logger_set_output_file(output);
+
+  LOG_INFO("%d", 5);
+  LOG_INFO("Using installed logger!");
+
   state_init(&state);
 
   sr_client_connect(&state.client, SERVER_IP, SERVER_PORT);
@@ -160,6 +168,8 @@ int main(void) {
   state.cross_texture = &cross_texture;
   state.empty_texture = &empty_texture;
 
+  LOG_INFO("Textures loaded");
+
   button_t *btns = malloc(BOARD_SIDE * BOARD_SIDE * sizeof(button_t));
 
   init_buttons(btns, &state, NULL);
@@ -177,6 +187,7 @@ int main(void) {
       restart_on_pressed
   );
 
+  LOG_INFO("Game loop started");
   while (!WindowShouldClose()) {
     receive_server_message(&state);
 
@@ -225,5 +236,7 @@ int main(void) {
   free(btns);
   free(restart_btn);
   CloseWindow();
+
+  fclose(output);
   return 0;
 }
