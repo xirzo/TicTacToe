@@ -1,8 +1,7 @@
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.25.0)
 
 project(tic_tac_toe)
 
-option(DEBUG_GAME OFF)
 option(FETCH_LIBS OFF)
 
 add_compile_options(-Wunused-function -Wall -Wextra)
@@ -27,6 +26,4 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(bin)
 add_subdirectory(lib)
 
-if (DEBUG_GAME)
-    file(COPY ${CMAKE_SOURCE_DIR}/start.sh DESTINATION ${CMAKE_BINARY_DIR}/bin)
-endif()
+file(COPY ${CMAKE_SOURCE_DIR}/start.sh DESTINATION ${CMAKE_BINARY_DIR}/bin)
