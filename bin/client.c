@@ -7,8 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "images.h"
 #include "game_state.h"
+#include "images.h"
+
 #include "button.h"
 #include "server.h"
 #include "types.h"
@@ -31,8 +32,8 @@ void button_on_pressed(button_t *btn) {
 
     float width =
         BOARD_SIDE * BOARD_BUTTON_SIZE + (BOARD_SIDE - 1) * BOARD_SPACING;
-    float start_x = (float)SCREEN_WIDTH / 2 - width / 2;
-    float start_y = (float)SCREEN_HEIGHT / 2 - width / 2;
+    float start_x = (float)GetScreenWidth() / 2 - width / 2;
+    float start_y = (float)GetScreenHeight() / 2 - width / 2;
 
     float relative_x = btn->pos.x - start_x;
     float relative_y = btn->pos.y - start_y;
@@ -46,7 +47,7 @@ void button_on_pressed(button_t *btn) {
         && state->cells[x][y] == CELL_EMPTY && !state->waiting_for_response) {
         client_message_t set_mark_msg = {
             .type = CLIENT_MSG_SET_MARK,
-            .data.position = (vec2){ x, y },
+            .data.position = (vec2){x, y},
         };
 
         if (sr_send_message_to_server(&state->client, &set_mark_msg) == 0) {
@@ -58,7 +59,7 @@ void button_on_pressed(button_t *btn) {
 }
 
 void receive_server_message(game_state_t *state) {
-    client_t        *client = &state->client;
+    client_t *client = &state->client;
     server_message_t msg;
 
     if (sr_receive_server_message(client, &msg) < 0) {
@@ -98,33 +99,39 @@ void init_buttons(button_t *btns, game_state_t *state, Texture2D *texture) {
     float width =
         BOARD_SIDE * BOARD_BUTTON_SIZE + (BOARD_SIDE - 1) * BOARD_SPACING;
 
-    float start_x = (float)SCREEN_WIDTH / 2 - width / 2;
-    float start_y = (float)SCREEN_HEIGHT / 2 - width / 2;
+    float start_x = (float)GetScreenWidth() / 2 - width / 2;
+    float start_y = (float)GetScreenHeight() / 2 - width / 2;
 
     for (int i = 0; i < BOARD_SIDE; i++) {
         for (int j = 0; j < BOARD_SIDE; j++) {
             button_t *btn = &btns[i + BOARD_SIDE * j];
-            vec2      pos = { start_x + i * (BOARD_BUTTON_SIZE + BOARD_SPACING),
-                              start_y + j * (BOARD_BUTTON_SIZE + BOARD_SPACING) };
-            vec2      size = { BOARD_BUTTON_SIZE, BOARD_BUTTON_SIZE };
+            vec2 pos = {start_x + i * (BOARD_BUTTON_SIZE + BOARD_SPACING),
+                        start_y + j * (BOARD_BUTTON_SIZE + BOARD_SPACING)};
+            vec2 size = {BOARD_BUTTON_SIZE, BOARD_BUTTON_SIZE};
 
-            button_init(
-                btn,
-                pos,
-                size,
-                INITIAL_COLOR,
-                texture,
-                (void *)state,
-                button_on_pressed
-            );
+            button_init(btn,
+                        pos,
+                        size,
+                        INITIAL_COLOR,
+                        texture,
+                        (void *)state,
+                        button_on_pressed);
         }
     }
 }
 
 void update_buttons(button_t *btns, game_state_t *state) {
+    float width =
+        BOARD_SIDE * BOARD_BUTTON_SIZE + (BOARD_SIDE - 1) * BOARD_SPACING;
+    float start_x = (float)GetScreenWidth() / 2 - width / 2;
+    float start_y = (float)GetScreenHeight() / 2 - width / 2;
+
     for (int i = 0; i < BOARD_SIDE; i++) {
         for (int j = 0; j < BOARD_SIDE; j++) {
             button_t *btn = &btns[i + BOARD_SIDE * j];
+
+            btn->pos.x = start_x + i * (BOARD_BUTTON_SIZE + BOARD_SPACING);
+            btn->pos.y = start_y + j * (BOARD_BUTTON_SIZE + BOARD_SPACING);
 
             switch (state->cells[i][j]) {
                 case CELL_EMPTY: {
@@ -159,26 +166,27 @@ int main(void) {
     SetTraceLogLevel(LOG_WARNING);
 #endif
 
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "TicTacToe");
     SetTargetFPS(FPS);
 
-    Image circle_img = { .data = CIRCLE_IMAGE_DATA,
-                         .width = CIRCLE_IMAGE_WIDTH,
-                         .height = CIRCLE_IMAGE_HEIGHT,
-                         .mipmaps = 1,
-                         .format = CIRCLE_IMAGE_FORMAT };
-
-    Image cross_img = { .data = CROSS_IMAGE_DATA,
-                        .width = CROSS_IMAGE_WIDTH,
-                        .height = CROSS_IMAGE_HEIGHT,
+    Image circle_img = {.data = CIRCLE_IMAGE_DATA,
+                        .width = CIRCLE_IMAGE_WIDTH,
+                        .height = CIRCLE_IMAGE_HEIGHT,
                         .mipmaps = 1,
-                        .format = CROSS_IMAGE_FORMAT };
+                        .format = CIRCLE_IMAGE_FORMAT};
 
-    Image empty_img = { .data = EMPTY_IMAGE_DATA,
-                        .width = EMPTY_IMAGE_WIDTH,
-                        .height = EMPTY_IMAGE_HEIGHT,
-                        .mipmaps = 1,
-                        .format = EMPTY_IMAGE_FORMAT };
+    Image cross_img = {.data = CROSS_IMAGE_DATA,
+                       .width = CROSS_IMAGE_WIDTH,
+                       .height = CROSS_IMAGE_HEIGHT,
+                       .mipmaps = 1,
+                       .format = CROSS_IMAGE_FORMAT};
+
+    Image empty_img = {.data = EMPTY_IMAGE_DATA,
+                       .width = EMPTY_IMAGE_WIDTH,
+                       .height = EMPTY_IMAGE_HEIGHT,
+                       .mipmaps = 1,
+                       .format = EMPTY_IMAGE_FORMAT};
 
     Texture2D circle_texture = LoadTextureFromImage(circle_img);
     Texture2D cross_texture = LoadTextureFromImage(cross_img);
@@ -200,14 +208,13 @@ int main(void) {
 
     button_init(
         restart_btn,
-        (vec2){ (float)SCREEN_WIDTH / 2 - (float)RESTART_BUTTON_WIDTH / 2,
-                (float)SCREEN_HEIGHT / 2 + RESTART_BUTTON_OFFSET_Y },
-        (vec2){ RESTART_BUTTON_WIDTH, RESTART_BUTTON_HEIGHT },
+        (vec2){(float)GetScreenWidth() / 2 - (float)RESTART_BUTTON_WIDTH / 2,
+               (float)GetScreenHeight() / 2 + RESTART_BUTTON_OFFSET_Y},
+        (vec2){RESTART_BUTTON_WIDTH, RESTART_BUTTON_HEIGHT},
         WHITE,
         NULL,
         &state,
-        restart_on_pressed
-    );
+        restart_on_pressed);
 
     while (!WindowShouldClose()) {
         receive_server_message(&state);
@@ -231,28 +238,30 @@ int main(void) {
 
         if (state.is_finished) {
             const char *text = "Game Finished!";
-            int         text_width = MeasureText(text, FONT_SIZE);
-            DrawText(
-                text,
-                SCREEN_WIDTH / 2 - text_width / 2,
-                SCREEN_HEIGHT / 2,
-                FONT_SIZE,
-                WHITE
-            );
+            int text_width = MeasureText(text, FONT_SIZE);
+            DrawText(text,
+                     GetScreenWidth() / 2 - text_width / 2,
+                     GetScreenHeight() / 2,
+                     FONT_SIZE,
+                     WHITE);
+
+            restart_btn->pos.x =
+                (float)GetScreenWidth() / 2 - (float)RESTART_BUTTON_WIDTH / 2;
+            restart_btn->pos.y =
+                (float)GetScreenHeight() / 2 + RESTART_BUTTON_OFFSET_Y;
 
             button_draw(restart_btn);
 
             const char *restart_text = "Restart";
-            int         restart_text_width =
+            int restart_text_width =
                 MeasureText(restart_text, RESTART_BUTTON_TEXT_SIZE);
             DrawText(
                 restart_text,
-                SCREEN_WIDTH / 2 - restart_text_width / 2,
-                SCREEN_HEIGHT / 2 + RESTART_BUTTON_OFFSET_Y
+                GetScreenWidth() / 2 - restart_text_width / 2,
+                GetScreenHeight() / 2 + RESTART_BUTTON_OFFSET_Y
                     + (RESTART_BUTTON_HEIGHT - RESTART_BUTTON_TEXT_SIZE) / 2,
                 RESTART_BUTTON_TEXT_SIZE,
-                BLACK
-            );
+                BLACK);
         }
 
         EndDrawing();
