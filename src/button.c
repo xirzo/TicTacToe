@@ -8,7 +8,7 @@ void button_init(
     Color color,
     Texture2D *texture,
     void *param,
-    void (*callback)()
+    void (*callback)(button_t *btn)
 ) {
   btn->state = -1;
   btn->pos = pos;

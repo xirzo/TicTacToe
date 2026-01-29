@@ -2,13 +2,13 @@
 
 make
 
-./tic_tac_toe_server &
+./build/tictactoe_server &
 SERVER_PID=$!
 
-./tic_tac_toe &
+./build/tictactoe_client &
 CLIENT1_PID=$!
 
-./tic_tac_toe &
+./build/tictactoe_client &
 CLIENT2_PID=$!
 
 cleanup() {
